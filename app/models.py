@@ -14,6 +14,18 @@ class Account(models.Model):
     name = models.CharField(max_length=100)
     balance = models.DecimalField(max_digits=8, decimal_places=2, default=0)
     vendor = models.BooleanField()
-    
+
     def __str__(self):
         return f"{self.id} - {self.name}"
+    
+class Product(models.Model):
+    title = models.CharField(max_length=160, null=True, blank=True)
+    image = models.CharField(max_length=512)
+    
+    description = models.CharField(max_length=512)
+    maxprice = models.DecimalField(max_digits=8, decimal_places=2, default=0) 
+    minprice = models.DecimalField(max_digits=8, decimal_places=2, default=0) 
+
+
+    def _str_(self):
+        return f"{self.id} -> {self.title}"

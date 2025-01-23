@@ -1,0 +1,20 @@
+<html>
+    <head>
+        <title>SlikaAPP v0.1</title>
+    </head>
+    <body>
+        <nav>
+            <a href="{% url 'homepage' %}">Home</a>
+        </nav>
+
+        <div>
+            {% block content %}
+
+            {% endblock content %}
+        </div>
+
+        <div>
+            Ovo je footer (c) 2024 
+        </div>
+    </body>
+</html>
