@@ -1,21 +1,76 @@
+{% load static %}
 <html>
-    <head>
-        <title>SlikaAPP v0.1</title>
-    </head>
-    <body>
-        <nav>
-            <a href="{% url 'homepage' %}">Home</a> |
-            <a href="{% url 'profile' %}">My Profile</a>
-        </nav>
+  <head>
+    <title>
+        Images app | 
+        {% block title %}
+        {% endblock %}
+    </title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js" integrity="sha384-LtrjvnR4Twt/qOuYxE721u19sVFLVSA4hf/rRt6PrZTmiPltdZcI7q7PXQBYTKyf" crossorigin="anonymous"></script>
 
-        <div>
-            {% block content %}
+    <link rel="stylesheet" href="{% static 'images/app.css' %}">
+  </head>
+  <body>
+    <div class="page-header">
+      <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="{% url 'homepage' %}">Home</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
 
-            {% endblock content %}
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'profile' %}">My Profile</a>
+            </li>
+            
+          </ul>
+          <ul class="navbar-nav ml-auto">
+            {% if request.user.is_authenticated %}
+              <li class="nav-item">
+            
+
+                <form action="{% url 'profile' %}" method="post">
+                    {% csrf_token %}
+                    <button class="btn btn-link nav-link" type="submit">{{ request.user.username}}</button>
+                  </form>
+
+
+
+                <form action="{% url 'logout' %}" method="post">
+                  {% csrf_token %}
+                  <button class="btn btn-link nav-link" type="submit">Logout</button>
+                </form>
+              </li>
+            {% else %}
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'login' %}">Login</a>
+              </li>
+            {% endif %}
+          </ul>
         </div>
+      </nav>
 
-        <div>
-            Ovo je footer (c) 2024 
+    </div>
+    <div class="content container">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="jumbotron fluid-jumbotron">
+            <div class="container">
+              <h1 class="display-4">Market Direct</h1>
+              <p class="lead">Your one stop place for posting your lamest images!</p>
+            </div>
+          </div>
         </div>
-    </body>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+          {% block content %}
+          {% endblock %}
+        </div>
+      </div>
+    </div>
+  </body>
 </html>
