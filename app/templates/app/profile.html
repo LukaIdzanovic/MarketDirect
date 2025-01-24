@@ -8,4 +8,25 @@
         e-mail:     {{ email }}<br>
         balance:    {{ balance }}
     </p>
+
+    {% if not request.user.account.vendor %}
+        <h2>Moje narudžbe</h2>
+        {% if orders %}
+            <ul>
+                {% for order in orders %}
+                    <li>
+                        <strong>Narudžba {{ order.id }}</strong> - {{ order.created_at }}<br>
+                        Ukupan iznos: {{ order.total }}
+                        <ul>
+                            {% for item in order.items.all %}
+                                <li>{{ item.quantity }} x {{ item.product.title }} - {{ item.subtotal }}</li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>Nemate nijednu narudžbu.</p>
+        {% endif %}
+    {% endif %}
 {% endblock content %}

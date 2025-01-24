@@ -3,7 +3,7 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, reverse
 from django.http import HttpResponse
-from .models import Product, Account, Cart, CartItem
+from .models import Product, Account, Cart, CartItem, Order, OrderItem
 from django.db import transaction
 from django.contrib import messages
 
@@ -25,14 +25,19 @@ def profile(request):
     except Account.DoesNotExist:
         account = None
 
+    # Dohvaćanje narudžbi korisnika
+    orders = Order.objects.filter(user=user).order_by('-created_at')
+
     context = {
         'username': user.username,
         'first_name': user.first_name,
         'last_name': user.last_name,
         'email': user.email,
-        'balance': account.balance
+        'balance': account.balance if account else 0,
+        'orders': orders,  # Prosljeđivanje narudžbi u kontekst
     }
     return render(request, 'app/profile.html', context)
+
 
 @login_required
 def products(request):
@@ -163,36 +168,44 @@ def remove_from_cart(request, item_id):
 @login_required
 def checkout(request):
     try:
-        # Dohvaćanje košarice korisnika
         cart = Cart.objects.get(user=request.user)
-        
+
         if cart.total > request.user.account.balance:
-            # Provjera je li kupac ima dovoljno novca
             messages.error(request, "Nemate dovoljno sredstava za ovu kupnju.")
             return redirect('cart')
 
-        # Transakcija za osiguranje konzistentnosti podataka
         with transaction.atomic():
+            # Kreiranje nove narudžbe
+            order = Order.objects.create(user=request.user, total=cart.total)
+
             for item in cart.items.all():
-                # Dodavanje iznosa na saldo vendora
+                # Dodavanje proizvoda u narudžbu
+                OrderItem.objects.create(
+                    order=order,
+                    product=item.product,
+                    quantity=item.quantity,
+                    subtotal=item.subtotal,
+                )
+
+                # Prijenos novca vendoru
                 vendor_account = item.product.user.account
                 vendor_account.balance += item.subtotal
                 vendor_account.save()
 
-            # Smanjivanje korisnikovog balansa
+            # Ažuriranje korisničkog balansa
             request.user.account.balance -= cart.total
             request.user.account.save()
 
-            # Brisanje stavki iz košarice nakon kupnje
+            # Pražnjenje košarice
             cart.items.all().delete()
             cart.total = 0
             cart.save()
 
         messages.success(request, "Kupnja uspješno obavljena!")
-        return redirect('cart')
+        return redirect('profile')
 
     except Cart.DoesNotExist:
-        # Ako korisnik nema košaricu
         messages.error(request, "Vaša košarica je prazna.")
         return redirect('cart')
+
 
