@@ -80,7 +80,7 @@ def add_new_products(request):
                     user = request.user
                 )
                 product.save()
-                return redirect( reverse('app/products.html',args=(product.id)))   
+                return redirect( reverse('products'))   
         context = {}
         return render(request, 'app/addNewProduct.html', context)
     return redirect('/')
