@@ -11,13 +11,6 @@ def home(request):
     context={}
     return render(request, 'app/home.html', context)
 
-def add_product(request):
-    if request.accounts.is_authenticated and request.accounts.vendor:
-        pass
-
-def remove_product(request):
-    if request.accounts.is_authenticated and request.accounts.vendor:
-        pass
 
 def profile(request):
     user = request.user 
@@ -84,3 +77,16 @@ def add_new_products(request):
         context = {}
         return render(request, 'app/addNewProduct.html', context)
     return redirect('/')
+
+@login_required
+def remove_product(request, product_id):
+    if request.user.account.vendor: 
+        try:
+            product = Product.objects.get(id=product_id, user=request.user)  # Provjera vlasništva
+            product.delete()
+            return redirect(reverse('products'))
+        except Product.DoesNotExist:
+            return redirect(reverse('products'))  # Ako proizvod ne postoji
+    return redirect('/')
+
+

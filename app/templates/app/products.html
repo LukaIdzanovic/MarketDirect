@@ -9,6 +9,10 @@
                 <img src="{{ product.image }}" alt="{{ product.title }}" style="width: 250px">
                 <p>{{ product.description }}</p>
                 <p>Cijena: {{ product.price }}</p>
+                <form action="{% url 'remove_product' product.id %}" method="POST" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Ukloni proizvod iz ponude</button>
+                </form>
             </div>
         {% empty %}
             <p>Nema proizvoda za prikaz.</p>
