@@ -1,14 +1,16 @@
 {% extends 'app/base.html' %}
 
 {% block content %}
-    <h1>Trgovci</h1>
-    <ul>
+    <h1>Popis trgovina</h1>
+    <p>Odaberite trgovinu kako biste pregledali njezin asortiman proizvoda.</p>
+    <div>
         {% for vendor in vendors %}
-            <li>
-                <strong>{{ vendor.name }}</strong><br>
-                Balance: {{ vendor.balance }}<br>
-                User: {{ vendor.user.username }}<br>
-            </li>
+            <form action="{% url 'shop_detail' vendor.id %}" method="GET" style="display:inline;">
+                <button type="submit" class="btn btn-primary">
+                    {{ vendor.name }}
+                </button>
+            </form>
+            <br>
         {% endfor %}
-    </ul>
+    </div>
 {% endblock content %}

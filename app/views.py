@@ -55,6 +55,22 @@ def shops(request):
     return render(request, 'app/shops.html', context)
 
 @login_required
+def shop_detail(request, shop_id):
+    try:
+        # Dohvat vendora prema ID-u
+        vendor = Account.objects.get(id=shop_id, vendor=True)
+        # Dohvat svih proizvoda tog vendora
+        products = Product.objects.filter(user=vendor.user)
+
+        context = {
+            'vendor': vendor,
+            'products': products,
+        }
+        return render(request, 'app/shop_detail.html', context)
+    except Account.DoesNotExist:
+        return redirect('shops') 
+
+@login_required
 def add_new_products(request):
     if request.user.account.vendor:  # Provjera da li korisnik NIJE vendor
         if request.method == "POST":

@@ -1,0 +1,21 @@
+{% extends 'app/base.html' %}
+
+{% block content %}
+    <h1>Trgovina: {{ vendor.name }}</h1>
+    
+    <h2>Proizvodi</h2>
+    <div>
+        {% for product in products %}
+            <div style="margin-bottom: 20px; border: 1px solid #ddd; padding: 10px;">
+                <h3>{{ product.title }}</h3>
+                <img src="{{ product.image }}" alt="{{ product.title }}" style="width: 250px">
+                <p>{{ product.description }}</p>
+                <p><strong>Cijena:</strong> {{ product.price }}</p>
+            </div>
+        {% empty %}
+            <p>Ova trgovina trenutno nema proizvoda.</p>
+        {% endfor %}
+    </div>
+
+    <a href="{% url 'shops' %}" class="btn btn-secondary">Natrag na trgovine</a>
+{% endblock content %}
