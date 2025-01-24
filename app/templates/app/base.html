@@ -51,7 +51,9 @@
                     <button class="btn btn-link nav-link" type="submit">{{ request.user.username}}</button>
                   </form>
 
-
+                  {% if not request.user.account.vendor %}
+                    <a href="{% url 'cart' %}" class="btn btn-primary">Moja košarica</a>
+                  {% endif %}
 
                 <form action="{% url 'logout' %}" method="post">
                   {% csrf_token %}
@@ -86,5 +88,15 @@
         </div>
       </div>
     </div>
+    {% if messages %}
+      <div>
+          {% for message in messages %}
+              <div class="alert alert-{{ message.tags }}">
+                  {{ message }}
+              </div>
+          {% endfor %}
+      </div>
+    {% endif %}
+
   </body>
 </html>

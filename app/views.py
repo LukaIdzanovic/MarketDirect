@@ -3,7 +3,9 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, reverse
 from django.http import HttpResponse
-from .models import Product, Account
+from .models import Product, Account, Cart, CartItem
+from django.db import transaction
+from django.contrib import messages
 
 
 # Create your views here.
@@ -105,4 +107,92 @@ def remove_product(request, product_id):
             return redirect(reverse('products'))  # Ako proizvod ne postoji
     return redirect('/')
 
+
+from django.shortcuts import get_object_or_404
+
+@login_required
+def cart(request):
+    # Dohvat košarice korisnika
+    cart, created = Cart.objects.get_or_create(user=request.user)
+
+    context = {
+        'cart': cart,
+        'items': cart.items.all(),  # Sve stavke u košarici
+        'total': cart.total
+    }
+    return render(request, 'app/cart.html', context)
+
+@login_required
+def add_to_cart(request, product_id):
+    # Dohvat proizvoda
+    product = get_object_or_404(Product, id=product_id)
+
+    # Dohvat ili stvaranje korisnikove košarice
+    cart, created = Cart.objects.get_or_create(user=request.user)
+
+    # Provjera postoji li proizvod već u košarici
+    cart_item, item_created = CartItem.objects.get_or_create(cart=cart, product=product)
+
+    if not item_created:
+        # Ako stavka već postoji, povećaj količinu
+        cart_item.quantity += 1
+    cart_item.save()
+
+    # Ažuriraj ukupan iznos košarice
+    cart.total = sum(item.subtotal for item in cart.items.all())
+    cart.save()
+
+    return redirect('cart')  # Preusmjeri na prikaz košarice
+
+@login_required
+def remove_from_cart(request, item_id):
+    # Dohvat stavke u košarici
+    cart_item = get_object_or_404(CartItem, id=item_id, cart__user=request.user)
+    cart = cart_item.cart
+
+    # Uklanjanje stavke
+    cart_item.delete()
+
+    # Ažuriraj ukupan iznos košarice
+    cart.total = sum(item.subtotal for item in cart.items.all())
+    cart.save()
+
+    return redirect('cart')
+
+
+@login_required
+def checkout(request):
+    try:
+        # Dohvaćanje košarice korisnika
+        cart = Cart.objects.get(user=request.user)
+        
+        if cart.total > request.user.account.balance:
+            # Provjera je li kupac ima dovoljno novca
+            messages.error(request, "Nemate dovoljno sredstava za ovu kupnju.")
+            return redirect('cart')
+
+        # Transakcija za osiguranje konzistentnosti podataka
+        with transaction.atomic():
+            for item in cart.items.all():
+                # Dodavanje iznosa na saldo vendora
+                vendor_account = item.product.user.account
+                vendor_account.balance += item.subtotal
+                vendor_account.save()
+
+            # Smanjivanje korisnikovog balansa
+            request.user.account.balance -= cart.total
+            request.user.account.save()
+
+            # Brisanje stavki iz košarice nakon kupnje
+            cart.items.all().delete()
+            cart.total = 0
+            cart.save()
+
+        messages.success(request, "Kupnja uspješno obavljena!")
+        return redirect('cart')
+
+    except Cart.DoesNotExist:
+        # Ako korisnik nema košaricu
+        messages.error(request, "Vaša košarica je prazna.")
+        return redirect('cart')
 

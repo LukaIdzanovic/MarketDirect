@@ -1,0 +1,31 @@
+{% extends 'app/base.html' %}
+
+{% block content %}
+    <h1>Moja košarica</h1>
+    <div>
+        {% if items %}
+            <ul>
+                {% for item in items %}
+                    <li>
+                        <strong>{{ item.product.title }}</strong> - {{ item.quantity }} kom 
+                        (ukupno: {{ item.subtotal }})
+                        <form action="{% url 'remove_from_cart' item.id %}" method="POST" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger">Ukloni</button>
+                        </form>
+                    </li>
+                {% endfor %}
+            </ul>
+            <p><strong>Ukupan iznos:</strong> {{ total }}</p>
+            <p><strong>Vaš saldo:</strong> {{ request.user.account.balance }}</p>
+            <form action="{% url 'checkout' %}" method="POST">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-success">Završi kupnju</button>
+            </form>
+        {% else %}
+            <p>Vaša košarica je prazna.</p>
+        {% endif %}
+    </div>
+    <a href="{% url 'shops' %}" class="btn btn-secondary">Natrag na trgovine</a>
+{% endblock content %}
+

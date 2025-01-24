@@ -2,19 +2,28 @@
 
 {% block content %}
     <h1>Trgovina: {{ vendor.name }}</h1>
-    
+    {% if request.user.account.vendor %}
+        <p>Vi ste vendor. Ovo su vaši proizvodi.</p>
+    {% else %}
+        <p>Vi ste kupac. Ovo su proizvodi ove trgovine.</p>
+    {% endif %}
     <h2>Proizvodi</h2>
     <div>
         {% for product in products %}
-            <div style="margin-bottom: 20px; border: 1px solid #ddd; padding: 10px;">
+            <div style="margin-bottom: 20px;">
                 <h3>{{ product.title }}</h3>
                 <img src="{{ product.image }}" alt="{{ product.title }}" style="width: 250px">
                 <p>{{ product.description }}</p>
                 <p><strong>Cijena:</strong> {{ product.price }}</p>
+                <form action="{% url 'add_to_cart' product.id %}" method="POST" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary">Dodaj u košaricu</button>
+                </form>
             </div>
         {% empty %}
             <p>Ova trgovina trenutno nema proizvoda.</p>
         {% endfor %}
+
     </div>
 
     <a href="{% url 'shops' %}" class="btn btn-secondary">Natrag na trgovine</a>
