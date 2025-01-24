@@ -2,11 +2,10 @@
 
 {% block content %}
     <h1>Your profile</h1>
-   
-        <p>username:{{ accounts.username }}<br>
-        first name: {{ accounts.first_name}}, last name: {{ accounts.last_name}}<br>
-        e-mail: {{accounts.email}} <br>
-        balance: {{ accounts.balance }}</p>
-        
-     
+    <p>
+        username:   {{ username }}<br>
+        first name: {{ first_name }}, last name: {{ last_name }}<br>
+        e-mail:     {{ email }}<br>
+        balance:    {{ balance }}
+    </p>
 {% endblock content %}

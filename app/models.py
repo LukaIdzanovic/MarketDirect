@@ -21,11 +21,10 @@ class Account(models.Model):
 class Product(models.Model):
     title = models.CharField(max_length=160, null=True, blank=True)
     image = models.CharField(max_length=512)
-    
     description = models.CharField(max_length=512)
     maxprice = models.DecimalField(max_digits=8, decimal_places=2, default=0) 
     minprice = models.DecimalField(max_digits=8, decimal_places=2, default=0) 
 
 
-    def _str_(self):
+    def __str__(self): 
         return f"{self.id} -> {self.title}"
