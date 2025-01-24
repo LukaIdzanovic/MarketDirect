@@ -4,8 +4,14 @@
     <h1>Svi proizvodi</h1>
     <div>
         {% for product in products %}
-            <h2>{{ product.id }}: {{ product.title }}</h2>
-            <img src="{{ product.image }}" style="width: 250px">
+            <div>
+                <h2>{{ product.id }}: {{ product.title }}</h2>
+                <img src="{{ product.image }}" alt="{{ product.title }}" style="width: 250px">
+                <p>{{ product.description }}</p>
+                <p>Cijena: {{ product.price }}</p>
+            </div>
+        {% empty %}
+            <p>Nema proizvoda za prikaz.</p>
         {% endfor %}
     </div>
 {% endblock content %}

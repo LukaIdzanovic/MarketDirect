@@ -22,9 +22,8 @@ class Product(models.Model):
     title = models.CharField(max_length=160, null=True, blank=True)
     image = models.CharField(max_length=512)
     description = models.CharField(max_length=512)
-    maxprice = models.DecimalField(max_digits=8, decimal_places=2, default=0) 
-    minprice = models.DecimalField(max_digits=8, decimal_places=2, default=0) 
-
+    price = models.DecimalField(max_digits=8, decimal_places=2, default=0) 
+    user = models.ForeignKey(User,on_delete=models.CASCADE)
 
     def __str__(self): 
         return f"{self.id} -> {self.title}"

@@ -1,0 +1,24 @@
+{% extends 'app/base.html' %}
+
+{% block content %}
+<div>
+    <form method="post" 
+          action="{% url 'addNewProduct' %}">
+        {% csrf_token %}  
+        <label>Title</label>
+        <input type="text" name="title"> <br>
+        
+        <label>Image</label>
+        <input type="text" name="image"> <br>
+
+        <label>Description</label>
+        <input type="text" name="description"> <br>
+
+        <label>Price</label>
+        <input type="number" name="price"> <br>
+
+        <input type="submit" value="Dodaj novi proizvod u svoju trgovinu">
+
+    </form>
+</div>
+{% endblock content %}
