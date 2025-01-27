@@ -2,23 +2,30 @@
 
 {% block content %}
 <div>
-    <form method="post" 
-          action="{% url 'addNewProduct' %}">
-        {% csrf_token %}  
-        <label>Title</label>
-        <input type="text" name="title"> <br>
+    <form method="post" enctype="multipart/form-data" action="{% url 'addNewProduct' %}">
+        {% csrf_token %}
         
-        <label>Image</label>
-        <input type="text" name="image"> <br>
+        <div class="mb-3">
+            <label for="title" class="form-label">Title</label>
+            <input type="text" class="form-control" name="title" id="title" required> <br>
+        </div>
+        
+        <div class="mb-3">
+            <label for="image" class="form-label">Image</label>
+            <input type="text" class="form-control" name="image" id="image" required> <br>
+        </div>
 
-        <label>Description</label>
-        <input type="text" name="description"> <br>
+        <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea class="form-control" name="description" id="description" required></textarea> <br>
+        </div>
 
-        <label>Price</label>
-        <input type="number" name="price"> <br>
+        <div class="mb-3">
+            <label for="price" class="form-label">Price</label>
+            <input type="number" class="form-control" name="price" id="price" required> <br>
+        </div>
 
-        <input type="submit" value="Dodaj novi proizvod u svoju trgovinu">
-
+        <button type="submit" class="btn btn-primary" style="background-color: rgba(26, 178, 26, 0.833);">Add New Product to Your Store</button>
     </form>
 </div>
 {% endblock content %}

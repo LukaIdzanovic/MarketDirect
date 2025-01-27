@@ -1,31 +1,58 @@
 {% extends 'app/base.html' %}
 
 {% block content %}
-    <h1>Moja košarica</h1>
-    <div>
-        {% if items %}
-            <ul>
+<div class="container py-5">
+    <h1 class="text-center mb-4">My Cart</h1>
+
+    {% if items %}
+    <div class="table-responsive">
+        <table class="table table-bordered">
+            <thead class="table-dark">
+                <tr>
+                    <th>Product</th>
+                    <th>Amount</th>
+                    <th>Price of one</th>
+                    <th>Total</th>
+                    <th>Edit</th>
+                </tr>
+            </thead>
+            <tbody>
                 {% for item in items %}
-                    <li>
-                        <strong>{{ item.product.title }}</strong> - {{ item.quantity }} kom 
-                        (ukupno: {{ item.subtotal }})
+                <tr>
+                    <td>{{ item.product.title }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>{{ item.product.price }} </td>
+                    <td>{{ item.subtotal }} </td>
+                    <td>
                         <form action="{% url 'remove_from_cart' item.id %}" method="POST" style="display:inline;">
                             {% csrf_token %}
-                            <button type="submit" class="btn btn-danger">Ukloni</button>
+                            <button type="submit" class="btn btn-danger btn-sm">Remove</button>
                         </form>
-                    </li>
+                    </td>
+                </tr>
                 {% endfor %}
-            </ul>
-            <p><strong>Ukupan iznos:</strong> {{ total }}</p>
-            <p><strong>Vaš saldo:</strong> {{ request.user.account.balance }}</p>
-            <form action="{% url 'checkout' %}" method="POST">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-success">Završi kupnju</button>
-            </form>
-        {% else %}
-            <p>Vaša košarica je prazna.</p>
-        {% endif %}
+            </tbody>
+        </table>
     </div>
-    <a href="{% url 'shops' %}" class="btn btn-secondary">Natrag na trgovine</a>
+
+    <div class="text-end">
+        <p><strong>Total price:</strong> {{ total }} </p>
+        <p><strong>Your balance:</strong> {{ request.user.account.balance }} </p>
+    </div>
+
+    <div class="text-center mt-4">
+        <form action="{% url 'checkout' %}" method="POST">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-success">Buy</button>
+        </form>
+    </div>
+    {% else %}
+    <div class="alert alert-warning text-center">Your cart is empty.</div>
+    {% endif %}
+
+    <div class="text-center mt-4">
+        <a href="{% url 'shops' %}" class="btn btn-secondary">Back to Shops</a>
+    </div>
+</div>
 {% endblock content %}
 

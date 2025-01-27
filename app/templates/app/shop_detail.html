@@ -1,30 +1,47 @@
 {% extends 'app/base.html' %}
 
 {% block content %}
-    <h1>Trgovina: {{ vendor.name }}</h1>
-    {% if request.user.account.vendor %}
-        <p>Vi ste vendor. Ovo su vaši proizvodi.</p>
-    {% else %}
-        <p>Vi ste kupac. Ovo su proizvodi ove trgovine.</p>
-    {% endif %}
-    <h2>Proizvodi</h2>
-    <div>
-        {% for product in products %}
-            <div style="margin-bottom: 20px;">
-                <h3>{{ product.title }}</h3>
-                <img src="{{ product.image }}" alt="{{ product.title }}" style="width: 250px">
-                <p>{{ product.description }}</p>
-                <p><strong>Cijena:</strong> {{ product.price }}</p>
-                <form action="{% url 'add_to_cart' product.id %}" method="POST" style="display:inline;">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-primary">Dodaj u košaricu</button>
-                </form>
-            </div>
-        {% empty %}
-            <p>Ova trgovina trenutno nema proizvoda.</p>
-        {% endfor %}
+<div class="container py-5">
+    <h1 class="text-center mb-4">Store: {{ vendor.name }}</h1>
+    <p class="text-center">
+        {% if request.user.account.vendor %}
+        These are the products in your store.
+        {% else %}
+        These are the products of this store.
+        {% endif %}
+    </p>
 
+    <h2 class="text-center mb-4">Products</h2>
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        {% for product in products %}
+        <div class="col">
+            <div class="card h-100 shadow-sm">
+                <img src="{{ product.image }}" class="card-img-top" style="height: 300px; width: 300px; align-self: center;" alt="{{ product.title }}">
+                <div class="card-body">
+                    <h5 class="card-title">{{ product.title }}</h5>
+                    <p class="card-text">{{ product.description|truncatechars:100 }}</p>
+                    <p class="fw-bold">Price: {{ product.price }} </p>
+                </div>
+                <div class="card-footer text-center">
+                    {% if not request.user.account.vendor %}
+                    <form action="{% url 'add_to_cart' product.id %}" method="POST">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary" style="background-color: rgba(26, 178, 26, 0.833);">Add to cart</button>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col">
+            <div class="alert alert-warning text-center">This store currently has no products.</div>
+        </div>
+        {% endfor %}
     </div>
 
-    <a href="{% url 'shops' %}" class="btn btn-secondary">Natrag na trgovine</a>
+    <div class="text-center mt-4">
+        <a href="{% url 'shops' %}" class="btn btn-secondary">Back to Shops</a>
+    </div>
+</div>
 {% endblock content %}
+

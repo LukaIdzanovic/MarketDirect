@@ -1,16 +1,27 @@
 {% extends 'app/base.html' %}
 
 {% block content %}
-    <h1>Popis trgovina</h1>
-    <p>Odaberite trgovinu kako biste pregledali njezin asortiman proizvoda.</p>
-    <div>
+<div class="container py-5">
+    <h1 class="text-center mb-4">All shops:</h1>
+    <p class="text-center">Choose a store to see their assortment of products.</p>
+
+    <div class="row row-cols-1 row-cols-md-3 g-4">
         {% for vendor in vendors %}
-            <form action="{% url 'shop_detail' vendor.id %}" method="GET" style="display:inline;">
-                <button type="submit" class="btn btn-primary">
-                    {{ vendor.name }}
-                </button>
-            </form>
-            <br>
+        <div class="col">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="card-title">{{ vendor.name }}</h5>
+                    <form action="{% url 'shop_detail' vendor.id %}" method="GET">
+                        <button type="submit" class="btn btn-primary" style="background-color: rgb(84, 83, 83);">Visit</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col">
+            <div class="alert alert-warning text-center">There are no shops available at the moment.</div>
+        </div>
         {% endfor %}
     </div>
+</div>
 {% endblock content %}

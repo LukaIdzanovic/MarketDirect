@@ -1,21 +1,32 @@
 {% extends 'app/base.html' %}
 
 {% block content %}
-    <h1>Svi proizvodi</h1>
-    <div>
+<div class="container py-5">
+    <h1 class="text-center mb-4">All Products</h1>
+
+    <div class="row row-cols-1 row-cols-md-3 g-4">
         {% for product in products %}
-            <div>
-                <h2>{{ product.id }}: {{ product.title }}</h2>
-                <img src="{{ product.image }}" alt="{{ product.title }}" style="width: 250px">
-                <p>{{ product.description }}</p>
-                <p>Cijena: {{ product.price }}</p>
-                <form action="{% url 'remove_product' product.id %}" method="POST" style="display:inline;">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-danger">Ukloni proizvod iz ponude</button>
-                </form>
+        <div class="col">
+            <div class="card h-100 shadow-sm">
+                <img src="{{ product.image }}" class="card-img-top" style="height: 300px; width: 300px; align-self: center;" alt="{{ product.title }}">
+                <div class="card-body">
+                    <h5 class="card-title">{{ product.title }}</h5>
+                    <p class="card-text">{{ product.description|truncatechars:100 }}</p>
+                    <p class="fw-bold">Price: {{ product.price }} </p>
+                </div>
+                <div class="card-footer text-center">
+                    <form action="{% url 'remove_product' product.id %}" method="POST">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger btn-sm">Remove Product</button>
+                    </form>
+                </div>
             </div>
+        </div>
         {% empty %}
-            <p>Nema proizvoda za prikaz.</p>
+        <div class="col">
+            <div class="alert alert-warning text-center">Currently no products available.</div>
+        </div>
         {% endfor %}
     </div>
+</div>
 {% endblock content %}
