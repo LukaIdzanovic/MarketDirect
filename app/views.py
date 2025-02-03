@@ -25,7 +25,6 @@ def profile(request):
     except Account.DoesNotExist:
         account = None
 
-    # Dohvaćanje narudžbi korisnika
     orders = Order.objects.filter(user=user).order_by('-created_at')
 
     context = {
@@ -34,7 +33,7 @@ def profile(request):
         'last_name': user.last_name,
         'email': user.email,
         'balance': account.balance if account else 0,
-        'orders': orders,  # Prosljeđivanje narudžbi u kontekst
+        'orders': orders, 
     }
     return render(request, 'app/profile.html', context)
 
@@ -64,9 +63,8 @@ def shops(request):
 @login_required
 def shop_detail(request, shop_id):
     try:
-        # Dohvat vendora prema ID-u
+
         vendor = Account.objects.get(id=shop_id, vendor=True)
-        # Dohvat svih proizvoda tog vendora
         products = Product.objects.filter(user=vendor.user)
 
         context = {
@@ -79,7 +77,7 @@ def shop_detail(request, shop_id):
 
 @login_required
 def add_new_products(request):
-    if request.user.account.vendor:  # Provjera da li korisnik NIJE vendor
+    if request.user.account.vendor:
         if request.method == "POST":
 
             title = request.POST.get('title')
@@ -105,11 +103,11 @@ def add_new_products(request):
 def remove_product(request, product_id):
     if request.user.account.vendor: 
         try:
-            product = Product.objects.get(id=product_id, user=request.user)  # Provjera vlasništva
+            product = Product.objects.get(id=product_id, user=request.user) 
             product.delete()
             return redirect(reverse('products'))
         except Product.DoesNotExist:
-            return redirect(reverse('products'))  # Ako proizvod ne postoji
+            return redirect(reverse('products'))
     return redirect('/')
 
 
@@ -117,48 +115,40 @@ from django.shortcuts import get_object_or_404
 
 @login_required
 def cart(request):
-    # Dohvat košarice korisnika
+
     cart, created = Cart.objects.get_or_create(user=request.user)
 
     context = {
         'cart': cart,
-        'items': cart.items.all(),  # Sve stavke u košarici
+        'items': cart.items.all(),  
         'total': cart.total
     }
     return render(request, 'app/cart.html', context)
 
 @login_required
 def add_to_cart(request, product_id):
-    # Dohvat proizvoda
     product = get_object_or_404(Product, id=product_id)
 
-    # Dohvat ili stvaranje korisnikove košarice
     cart, created = Cart.objects.get_or_create(user=request.user)
 
-    # Provjera postoji li proizvod već u košarici
     cart_item, item_created = CartItem.objects.get_or_create(cart=cart, product=product)
 
     if not item_created:
-        # Ako stavka već postoji, povećaj količinu
         cart_item.quantity += 1
     cart_item.save()
 
-    # Ažuriraj ukupan iznos košarice
     cart.total = sum(item.subtotal for item in cart.items.all())
     cart.save()
 
-    return redirect('cart')  # Preusmjeri na prikaz košarice
+    return redirect('cart') 
 
 @login_required
 def remove_from_cart(request, item_id):
-    # Dohvat stavke u košarici
     cart_item = get_object_or_404(CartItem, id=item_id, cart__user=request.user)
     cart = cart_item.cart
 
-    # Uklanjanje stavke
     cart_item.delete()
 
-    # Ažuriraj ukupan iznos košarice
     cart.total = sum(item.subtotal for item in cart.items.all())
     cart.save()
 
@@ -175,11 +165,9 @@ def checkout(request):
             return redirect('cart')
 
         with transaction.atomic():
-            # Kreiranje nove narudžbe
             order = Order.objects.create(user=request.user, total=cart.total)
 
             for item in cart.items.all():
-                # Dodavanje proizvoda u narudžbu
                 OrderItem.objects.create(
                     order=order,
                     product=item.product,
@@ -187,16 +175,13 @@ def checkout(request):
                     subtotal=item.subtotal,
                 )
 
-                # Prijenos novca vendoru
                 vendor_account = item.product.user.account
                 vendor_account.balance += item.subtotal
                 vendor_account.save()
 
-            # Ažuriranje korisničkog balansa
             request.user.account.balance -= cart.total
             request.user.account.save()
 
-            # Pražnjenje košarice
             cart.items.all().delete()
             cart.total = 0
             cart.save()
